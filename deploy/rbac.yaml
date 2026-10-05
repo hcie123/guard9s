@@ -1,0 +1,36 @@
+# Administrator-reviewed example. guard9s itself never applies this manifest.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: guard9s-reader
+rules:
+  - apiGroups: [""]
+    resources: [nodes, pods, namespaces, persistentvolumeclaims, persistentvolumes, events]
+    verbs: [get, list, watch]
+  - apiGroups: [apps]
+    resources: [deployments, replicasets, statefulsets, daemonsets]
+    verbs: [get, list, watch]
+  - apiGroups: [batch]
+    resources: [jobs, cronjobs]
+    verbs: [get, list, watch]
+  - apiGroups: [policy]
+    resources: [poddisruptionbudgets]
+    verbs: [get, list, watch]
+  - apiGroups: [storage.k8s.io]
+    # CSI node/attachment evidence is optional; denied access does not block core startup.
+    resources: [storageclasses, csinodes, volumeattachments]
+    verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: guard9s-readers
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: guard9s-reader
+subjects:
+  # Replace only after reviewing your identity provider's group membership.
+  - apiGroup: rbac.authorization.k8s.io
+    kind: Group
+    name: guard9s-viewers

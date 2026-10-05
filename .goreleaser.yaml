@@ -1,0 +1,29 @@
+version: 2
+project_name: guard9s
+# Run snapshot builds from the repository root with GoReleaser OSS.
+# Publishing is disabled until an explicit release/tagging workflow is chosen.
+release:
+  disable: true
+before:
+  hooks:
+    - go mod download
+builds:
+  - id: guard9s
+    main: ./cmd/guard9s
+    binary: guard9s
+    env: [CGO_ENABLED=0]
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    flags: [-trimpath]
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}}
+archives:
+  - formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files: [README.md, LICENSE, NOTICE, CHANGELOG.md, SECURITY.md, CONTRIBUTING.md, CODE_OF_CONDUCT.md, deploy/rbac.yaml, "docs/*.md", docs/demo.svg]
+checksum:
+  name_template: checksums.txt
+changelog:
+  disable: true

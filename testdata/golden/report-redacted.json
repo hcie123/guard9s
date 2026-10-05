@@ -1,0 +1,182 @@
+{
+  "schemaVersion": "guard9s/v1",
+  "version": "golden",
+  "capturedAt": "2026-01-16T12:00:00Z",
+  "context": "context-001",
+  "node": "node-001",
+  "analysisScope": "all namespaces",
+  "readOnly": true,
+  "readiness": "NOT RECOMMENDED",
+  "redaction": "basic",
+  "redacted": true,
+  "redactionMode": "basic",
+  "commandsRedacted": true,
+  "capabilities": {
+    "csinodes": {
+      "state": "Available"
+    },
+    "namespaces": {
+      "state": "Available"
+    },
+    "volumeattachments": {
+      "state": "Unsupported",
+      "detail": "not collected in v0.3"
+    }
+  },
+  "schedulingCandidates": [
+    {
+      "namespace": "namespace-001",
+      "pod": "pod-001",
+      "nodes": [
+        {
+          "node": "node-002",
+          "status": "ALLOWED",
+          "reasons": [
+            "hard taints are tolerated",
+            "nodeSelector and required nodeAffinity match"
+          ]
+        },
+        {
+          "node": "node-003",
+          "status": "ALLOWED",
+          "reasons": [
+            "hard taints are tolerated",
+            "nodeSelector and required nodeAffinity match"
+          ]
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "HIGH",
+      "unknown": false,
+      "category": "Replica",
+      "namespace": "namespace-001",
+      "resource": "pod-001",
+      "resourceKind": "Pod",
+      "reason": "Only one ready replica is available.",
+      "evidence": "owner=Deployment/deployment-001; desired=24; observed ready pods=1; ready on other nodes=0; controller ready=24",
+      "recommendation": "Validate additional healthy replicas and application availability before maintenance."
+    },
+    {
+      "severity": "PASS",
+      "unknown": false,
+      "category": "Capacity",
+      "namespace": "",
+      "resource": "node-001",
+      "resourceKind": "Node",
+      "reason": "A request-based placement fits the snapshot. Actual utilization, ephemeral storage, backend attachment transitions, scheduler plugins, pending demand and concurrent changes are not simulated.",
+      "evidence": "Relocate: CPU 0.25 cores | memory 0.25 GiB | pods 1; eligible remaining: CPU 16.00 cores | memory 32.00 GiB | pods 220; eligible nodes=[node-002 node-003]",
+      "recommendation": "Recheck immediately before drain; requests are not live usage and this is not an exact scheduler simulation."
+    },
+    {
+      "severity": "PASS",
+      "unknown": false,
+      "category": "Node",
+      "namespace": "",
+      "resource": "node-001",
+      "resourceKind": "Node",
+      "reason": "DiskPressure=False",
+      "evidence": "status.conditions: DiskPressure=False",
+      "recommendation": "Recheck immediately before maintenance."
+    },
+    {
+      "severity": "PASS",
+      "unknown": false,
+      "category": "Node",
+      "namespace": "",
+      "resource": "node-001",
+      "resourceKind": "Node",
+      "reason": "MemoryPressure=False",
+      "evidence": "status.conditions: MemoryPressure=False",
+      "recommendation": "Recheck immediately before maintenance."
+    },
+    {
+      "severity": "PASS",
+      "unknown": false,
+      "category": "Node",
+      "namespace": "",
+      "resource": "node-001",
+      "resourceKind": "Node",
+      "reason": "NetworkUnavailable=False",
+      "evidence": "status.conditions: NetworkUnavailable=False",
+      "recommendation": "Recheck immediately before maintenance."
+    },
+    {
+      "severity": "PASS",
+      "unknown": false,
+      "category": "Node",
+      "namespace": "",
+      "resource": "node-001",
+      "resourceKind": "Node",
+      "reason": "PIDPressure=False",
+      "evidence": "status.conditions: PIDPressure=False",
+      "recommendation": "Recheck immediately before maintenance."
+    },
+    {
+      "severity": "PASS",
+      "unknown": false,
+      "category": "Node",
+      "namespace": "",
+      "resource": "node-001",
+      "resourceKind": "Node",
+      "reason": "Ready=True",
+      "evidence": "status.conditions: Ready=True",
+      "recommendation": "Recheck immediately before maintenance."
+    },
+    {
+      "severity": "PASS",
+      "unknown": false,
+      "category": "PDB",
+      "namespace": "namespace-001",
+      "resource": "pod-001",
+      "resourceKind": "Pod",
+      "reason": "PDB currently permits a disruption.",
+      "evidence": "PDB=namespace-001/pdb-001; minAvailable=unset; maxUnavailable=9; currentHealthy=24; desiredHealthy=15; expectedPods=24; disruptionsAllowed=9; generation=1; observedGeneration=1",
+      "recommendation": "Evict sequentially and re-evaluate the budget as replacements become Ready."
+    },
+    {
+      "severity": "PASS",
+      "unknown": false,
+      "category": "Scheduling",
+      "namespace": "namespace-001",
+      "resource": "pod-001",
+      "resourceKind": "Pod",
+      "reason": "Other nodes satisfy checked hard constraints.",
+      "evidence": "Candidate nodes: ALLOWED=2 REJECTED=0 UNKNOWN=0. Detailed reasons are in resource detail and report schedulingCandidates. Best-effort scheduling feasibility analysis; not a kube-scheduler simulation.",
+      "recommendation": "Validate placement with the current scheduler configuration; preferred constraints are not simulated."
+    }
+  ],
+  "capacity": {
+    "assessment": "PASS",
+    "detail": "A request-based placement fits the snapshot. Actual utilization, ephemeral storage, backend attachment transitions, scheduler plugins, pending demand and concurrent changes are not simulated.",
+    "demand": {
+      "cpuMillicores": 250,
+      "memoryBytes": 268435456,
+      "pods": 1
+    },
+    "eligibleFree": {
+      "cpuMillicores": 16000,
+      "memoryBytes": 34359738368,
+      "pods": 220
+    },
+    "pendingDemand": {
+      "cpuMillicores": 0,
+      "memoryBytes": 0,
+      "pods": 0
+    },
+    "eligibleNodes": [
+      "node-002",
+      "node-003"
+    ]
+  },
+  "plan": "MAINTENANCE PLAN · \u003credacted-node\u003e\nContext: \u003credacted-context\u003e | Scope: ALL namespaces\nReadiness: NOT RECOMMENDED\n\nDISPLAY ONLY — commands are never executed.\n\nPreflight evidence\n\nBLOCKED BY\nHIGH namespace-001/pod-001: Only one ready replica is available.\n  Evidence: owner=Deployment/deployment-001; desired=24; observed ready pods=1; ready on other nodes=0; controller ready=24\n  Review: Validate additional healthy replicas and application availability before maintenance.\n\nUNKNOWN\n(none observed)\n\nWARNINGS\n(none observed)\n\nVALIDATE — Suggested validation (use the same kubeconfig as guard9s)\nkubectl --context '\u003credacted-context\u003e' get node '\u003credacted-node\u003e' -o wide\nkubectl --context '\u003credacted-context\u003e' get pods -A --field-selector 'spec.nodeName=\u003credacted-node\u003e'\nkubectl --context '\u003credacted-context\u003e' get pdb -A\n\nMaintenance cannot currently be recommended.\n1. Resolve blocking and UNKNOWN findings.\n2. Review workload availability, PDBs and storage relocation.\n3. Validate spare capacity and traffic convergence.\n4. Re-run diagnosis.\n\nNo cordon/drain commands are suggested for this result.\n\nBASIC REDACTION: Redacted commands are documentation-only and must not be executed verbatim.",
+  "limitations": [
+    "Point-in-time evidence; informer snapshots are not cross-resource transactions and readiness does not guarantee availability.",
+    "Best-effort scheduling feasibility analysis; not a kube-scheduler simulation.",
+    "Capacity uses requests, not live usage. Pending demand is reported but not allocated; preemption, unobserved CSI attachments and concurrent changes are not simulated.",
+    "Basic redaction masks known snapshot identifiers, images, recorded paths and detected network addresses. Arbitrary business prose, encoded secrets and unknown identifiers may remain; review before sharing. Resource aliases are type-aware and deterministic for the same snapshot. Ambiguous untyped prose uses identifier aliases.",
+    "Commands are suggestions only and must use the same trusted kubeconfig as collection; guard9s never executes them."
+  ]
+}

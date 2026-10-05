@@ -1,0 +1,16 @@
+Candidate nodes (post-removal projection; ALLOWED covers checked constraints only):
+
+ALLOWED (1)
+  worker-02
+    hard taints are tolerated
+    nodeSelector and required nodeAffinity match
+    required podAffinity topology.kubernetes.io/zone=zone-b peers=1
+
+REJECTED (1)
+  worker-03
+    hard taints are tolerated
+    no remaining peer satisfies all required podAffinity terms in topology.kubernetes.io/zone=zone-c
+    nodeSelector and required nodeAffinity match
+
+UNKNOWN (0)
+  (none observed)
