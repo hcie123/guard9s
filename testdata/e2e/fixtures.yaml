@@ -1,0 +1,210 @@
+# Installed only by the disposable kind test harness, with its admin identity.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo-a
+  labels: {guard9s.io/team: a}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo-b
+  labels: {guard9s.io/team: b}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: web, namespace: demo-a}
+spec:
+  replicas: 2
+  selector: {matchLabels: {app: web}}
+  template:
+    metadata: {labels: {app: web}}
+    spec:
+      nodeSelector: {guard9s.io/role: worker}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector: {matchLabels: {app: web}}
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: web
+          image: registry.k8s.io/pause:3.10.1
+          resources: {requests: {cpu: 10m, memory: 16Mi}}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: {name: web, namespace: demo-a}
+spec:
+  minAvailable: 2
+  selector: {matchLabels: {app: web}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: web-single, namespace: demo-a}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: web-single}}
+  template:
+    metadata: {labels: {app: web-single}}
+    spec:
+      nodeSelector: {guard9s.io/worker: worker-a}
+      containers:
+        - name: web
+          image: registry.k8s.io/pause:3.10.1
+          resources: {requests: {cpu: 10m, memory: 16Mi}}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata: {name: agent, namespace: demo-a}
+spec:
+  selector: {matchLabels: {app: agent}}
+  template:
+    metadata: {labels: {app: agent}}
+    spec:
+      nodeSelector: {guard9s.io/role: worker}
+      containers:
+        - name: agent
+          image: registry.k8s.io/pause:3.10.1
+          resources: {requests: {cpu: 10m, memory: 16Mi}}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata: {name: database-pv}
+spec:
+  capacity: {storage: 32Mi}
+  accessModes: [ReadWriteOnce]
+  storageClassName: ""
+  persistentVolumeReclaimPolicy: Retain
+  hostPath: {path: /tmp/guard9s-kind-data, type: DirectoryOrCreate}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: guard9s.io/worker
+              operator: In
+              values: [worker-a]
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: {name: database, namespace: demo-a}
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: ""
+  volumeName: database-pv
+  resources: {requests: {storage: 32Mi}}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata: {name: database, namespace: demo-a}
+spec:
+  serviceName: database
+  replicas: 1
+  selector: {matchLabels: {app: database}}
+  template:
+    metadata: {labels: {app: database}}
+    spec:
+      nodeSelector: {guard9s.io/worker: worker-a}
+      containers:
+        - name: database
+          image: registry.k8s.io/pause:3.10.1
+          resources: {requests: {cpu: 10m, memory: 16Mi}}
+          volumeMounts: [{name: data, mountPath: /data}]
+      volumes:
+        - name: data
+          persistentVolumeClaim: {claimName: database}
+---
+apiVersion: v1
+kind: Pod
+metadata: {name: peer, namespace: demo-b, labels: {app: peer}}
+spec:
+  nodeName: WORKER_B
+  containers:
+    - name: web
+      image: registry.k8s.io/pause:3.10.1
+      resources: {requests: {cpu: 10m, memory: 16Mi}}
+---
+apiVersion: v1
+kind: Pod
+metadata: {name: affinity, namespace: demo-a}
+spec:
+  nodeName: WORKER_A
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: guard9s.io/role
+                operator: In
+                values: [worker]
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - topologyKey: kubernetes.io/hostname
+          labelSelector: {matchLabels: {app: peer}}
+          namespaceSelector: {matchLabels: {guard9s.io/team: b}}
+  containers:
+    - name: web
+      image: registry.k8s.io/pause:3.10.1
+      resources: {requests: {cpu: 10m, memory: 16Mi}}
+---
+apiVersion: v1
+kind: Pod
+metadata: {name: anti-affinity, namespace: demo-a}
+spec:
+  nodeName: WORKER_A
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - topologyKey: kubernetes.io/hostname
+          labelSelector: {matchLabels: {app: peer}}
+          namespaceSelector: {matchLabels: {guard9s.io/team: b}}
+  containers:
+    - name: web
+      image: registry.k8s.io/pause:3.10.1
+      resources: {requests: {cpu: 10m, memory: 16Mi}}
+---
+apiVersion: v1
+kind: Pod
+metadata: {name: spread, namespace: demo-a, labels: {app: spread}}
+spec:
+  nodeName: WORKER_A
+  nodeSelector: {guard9s.io/role: worker}
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: DoNotSchedule
+      labelSelector: {matchLabels: {app: spread}}
+  containers:
+    - name: web
+      image: registry.k8s.io/pause:3.10.1
+      resources: {requests: {cpu: 10m, memory: 16Mi}}
+---
+apiVersion: v1
+kind: Pod
+metadata: {name: scratch, namespace: demo-a}
+spec:
+  nodeName: WORKER_A
+  volumes: [{name: scratch, emptyDir: {}}, {name: host, hostPath: {path: /tmp/guard9s-kind-scratch, type: DirectoryOrCreate}}]
+  containers:
+    - name: web
+      image: registry.k8s.io/pause:3.10.1
+      resources: {requests: {cpu: 10m, memory: 16Mi}}
+---
+apiVersion: v1
+kind: Pod
+metadata: {name: pending, namespace: demo-a}
+spec:
+  nodeSelector: {guard9s.io/worker: unavailable-synthetic-worker}
+  containers:
+    - name: web
+      image: registry.k8s.io/pause:3.10.1
+      resources: {requests: {cpu: 10m, memory: 16Mi}}
+---
+apiVersion: v1
+kind: Event
+metadata: {name: synthetic-warning, namespace: demo-a}
+type: Warning
+reason: SyntheticFixture
+message: Disposable kind fixture; no backend failure is asserted.
+involvedObject: {apiVersion: v1, kind: Pod, namespace: demo-a, name: scratch}
+source: {component: guard9s-e2e}
+count: 1

@@ -1,6 +1,6 @@
 version: 2
 project_name: guard9s
-# Run snapshot builds from guard9s/ with GoReleaser OSS.
+# Run snapshot builds from the repository root with GoReleaser OSS.
 # Publishing is disabled until an explicit release/tagging workflow is chosen.
 release:
   disable: true

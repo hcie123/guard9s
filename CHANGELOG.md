@@ -3,9 +3,10 @@
 ## v0.4.0 — Initial Open Source Release (prepared, not published)
 
 These are release notes for the planned v0.4.0. No v0.4.0 tag or GitHub Release
-has been created. The monorepo remains private; public distribution and standalone
-extraction require a separate decision. This preparation changes documentation
-and archive file selection only; product behavior remains frozen.
+has been created. The standalone repository remains private; public distribution
+requires a separate decision. The migration preserves product behavior, tests
+and dependencies, with only module/import, repository-path and documentation
+adjustments.
 
 ### What guard9s does
 
@@ -113,7 +114,7 @@ The entries below are development history, not additional published releases.
 
 ## Development history — V1 preview
 
-- Add guard9s as an independent Go module in the infra-lab repository.
+- Add guard9s as an independent Go module.
 - Add offline mixed/healthy demo scenarios and keyboard-first tview/tcell UI.
 - Add Nodes, Pods, Risks, Events, Diagnosis, Maintenance Plan, Capacity, PDB and Storage views.
 - Add eight evidence-based analyzers with conservative UNKNOWN results.

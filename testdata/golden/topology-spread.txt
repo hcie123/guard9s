@@ -1,0 +1,16 @@
+Candidate nodes (post-removal projection; ALLOWED covers checked constraints only):
+
+ALLOWED (1)
+  worker-03
+    hard taints are tolerated
+    nodeSelector and required nodeAffinity match
+    topology topology.kubernetes.io/zone=zone-c count=0 incoming=1 global minimum=0 eligible domains=3 skew=1 maxSkew=1
+
+REJECTED (1)
+  worker-02
+    hard taints are tolerated
+    hard topology spread exceeds maxSkew: topology topology.kubernetes.io/zone=zone-b count=1 incoming=1 global minimum=0 eligible domains=3 skew=2 maxSkew=1
+    nodeSelector and required nodeAffinity match
+
+UNKNOWN (0)
+  (none observed)

@@ -1,6 +1,6 @@
 # Contributing to guard9s
 
-Start with `make demo` and read the analysis contract. This project lives in a shared repository: modify only `guard9s/` and its dedicated CI workflow. Work on a branch and open a pull request; do not push changes directly to main.
+Start with `make demo` and read the analysis contract. The project lives at https://github.com/hcie123/guard9s. Run development commands from the repository root; CI is in `.github/workflows/ci.yml`. Work on a branch and open a pull request; do not push changes directly to main.
 
 ## Development
 
@@ -20,6 +20,6 @@ V1 has no cluster mutation path. Do not add shell execution, kubectl wrappers, e
 - Verify that blocked/unknown evidence cannot produce a READY plan.
 - Review request accounting and namespace scope if changing capacity.
 - Update documentation for behavior changes and known limits.
-- Ensure only project-specific files and its workflow changed.
+- Keep the diff focused on the intended project change.
 
 Contributor conduct is defined in CODE_OF_CONDUCT.md. Security reports follow SECURITY.md. Contributions are accepted under this project's Apache-2.0 license.

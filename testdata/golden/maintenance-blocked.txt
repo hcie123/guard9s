@@ -1,0 +1,35 @@
+MAINTENANCE PLAN · worker-01
+Context: demo-cluster | Scope: ALL namespaces
+Readiness: BLOCKED
+
+DISPLAY ONLY — commands are never executed.
+
+Preflight evidence
+
+BLOCKED BY
+CRITICAL demo/nginx-1-01: PDB prevents eviction.
+  Evidence: budget=nginx-budget; disruptionsAllowed=0
+  Review: Restore budget allowance before maintenance.
+
+UNKNOWN
+HIGH demo/nginx-1-01: Placement evidence is incomplete.
+  Evidence: UNKNOWN: namespace labels unavailable
+  Review: Review placement constraints.
+
+WARNINGS
+WARN demo/nginx-1-01: Data requires validation.
+  Evidence: volume=emptyDir
+  Review: Verify data is disposable.
+
+VALIDATE — Suggested validation (use the same kubeconfig as guard9s)
+kubectl --context 'demo-cluster' get node 'worker-01' -o wide
+kubectl --context 'demo-cluster' get pods -A --field-selector 'spec.nodeName=worker-01'
+kubectl --context 'demo-cluster' get pdb -A
+
+Maintenance cannot currently be recommended.
+1. Resolve blocking and UNKNOWN findings.
+2. Review workload availability, PDBs and storage relocation.
+3. Validate spare capacity and traffic convergence.
+4. Re-run diagnosis.
+
+No cordon/drain commands are suggested for this result.
