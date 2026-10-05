@@ -1,0 +1,50 @@
+name: guard9s release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Verify tag points at main
+        shell: bash
+        run: |
+          git fetch origin main --no-tags
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: '1.26.x'
+          cache-dependency-path: go.sum
+
+      - name: Module integrity
+        run: |
+          go mod verify
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
+
+      - name: Install pinned GoReleaser with checksum verification
+        run: |
+          curl --fail --silent --show-error --location -o /tmp/goreleaser_Linux_x86_64.tar.gz https://github.com/goreleaser/goreleaser/releases/download/v2.18.2/goreleaser_Linux_x86_64.tar.gz
+          curl --fail --silent --show-error --location -o /tmp/goreleaser-checksums.txt https://github.com/goreleaser/goreleaser/releases/download/v2.18.2/checksums.txt
+          cd /tmp
+          grep '  goreleaser_Linux_x86_64.tar.gz$' goreleaser-checksums.txt | sha256sum --check
+          tar -xzf goreleaser_Linux_x86_64.tar.gz goreleaser
+          sudo install -m 0755 goreleaser /usr/local/bin/goreleaser
+          goreleaser --version
+
+      - name: Publish GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: goreleaser release --clean
