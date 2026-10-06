@@ -34,7 +34,7 @@ func Snapshot(scenario string) model.Snapshot {
 	s.Capabilities = map[string]model.Capability{
 		model.NamespacesResource:        {State: model.Available},
 		model.CSINodesResource:          {State: model.Available},
-		model.VolumeAttachmentsResource: {State: model.Unsupported, Detail: "not collected in v0.3"},
+		model.VolumeAttachmentsResource: {State: model.Unsupported, Detail: "not collected in this synthetic snapshot"},
 	}
 	for _, name := range []string{"demo", "monitoring", "production"} {
 		s.Namespaces = append(s.Namespaces, &core.Namespace{ObjectMeta: metadata("", name)})
