@@ -1,12 +1,11 @@
 # Changelog
 
-## v0.4.0 — Initial Open Source Release (prepared, not published)
+## v0.4.0 — Initial Open Source Release
 
-These are release notes for the planned v0.4.0. No v0.4.0 tag or GitHub Release
-has been created. The standalone repository remains private; public distribution
-requires a separate decision. The migration preserves product behavior, tests
-and dependencies, with only module/import, repository-path and documentation
-adjustments.
+v0.4.0 was published on 2026-10-06 as guard9s' initial open source release.
+The standalone repository is public, and the formal GitHub Release is available
+at https://github.com/hcie123/guard9s/releases/tag/v0.4.0. The release tag points
+to commit `e0c2f54208085a8ef72d11c59873923ee2404b74`.
 
 ### What guard9s does
 
@@ -44,8 +43,8 @@ before an operator considers cordon or drain. It does not execute maintenance.
 
 Use a prebuilt archive for Linux, macOS or Windows on amd64/arm64; Go is not
 required to run it. Verify the matching checksums.txt before extraction. Formal
-v0.4.0 download links will be available only after publication. Source builds
-require Go 1.26+, as declared in go.mod. The single bilingual
+v0.4.0 downloads are available from the GitHub Release linked above. Source
+builds require Go 1.26+, as declared in go.mod. The single bilingual
 [README](README.md#installation) includes installation and CLI examples.
 
 ### Safety model
@@ -131,4 +130,4 @@ The entries below are development history, not additional published releases.
 - Include initContainer/native sidecar hostPort constraints and deduplicate UNKNOWN explanations.
 - Add synthetic capacity-redraw/report benchmarks and regressions for cache replacement, cancellation and result parity.
 
-No public release or tag has been created. No Kubernetes mutation functionality is included.
+v0.4.0 is the first public guard9s release. No Kubernetes mutation functionality is included.
