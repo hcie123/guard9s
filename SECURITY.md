@@ -15,7 +15,7 @@ Read-only does not mean nonsensitive: Pod specifications and Event messages can 
 
 ## Supported versions
 
-This is a pre-release v0.4 implementation. Disposable kind integration has validated the read-only boundary on Kubernetes v1.34.11 and v1.35.8, including zero observed collector non-GET requests. This is not a production safety guarantee or security audit; backend-specific CSI behavior and the operator's own test-cluster validation remain necessary before operational use.
+v0.4.0 is the initial public release. Disposable kind integration has validated the read-only boundary on Kubernetes v1.34.11 and v1.35.8, including zero observed collector non-GET requests. This is not a production safety guarantee or security audit; backend-specific CSI behavior and the operator's own test-cluster validation remain necessary before operational use.
 
 ## Reporting
 
