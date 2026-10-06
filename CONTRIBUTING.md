@@ -4,7 +4,7 @@ Start with `make demo` and read the analysis contract. The project lives at http
 
 ## Development
 
-Requires Go 1.26+, Make (optional) and a terminal. `make check` runs format checks, vet, unit tests, the race detector, a 90% aggregate core coverage gate and a static binary build. `make snapshot` regenerates the actual demo screen used by the README. GoReleaser snapshot packaging is optional; this configuration does not publish releases.
+Requires Go 1.26+, Make (optional) and a terminal. `make check` runs format checks, vet, unit tests, the race detector, a 90% aggregate core coverage gate and a static binary build. `make snapshot` regenerates the actual demo screen used by the README. GoReleaser snapshot packaging is optional and non-publishing; formal tagged releases are published by `.github/workflows/release.yml`.
 
 ## Changes we welcome
 
