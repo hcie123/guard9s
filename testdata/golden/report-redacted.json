@@ -20,7 +20,7 @@
     },
     "volumeattachments": {
       "state": "Unsupported",
-      "detail": "not collected in this synthetic demo"
+      "detail": "not collected in this synthetic snapshot"
     }
   },
   "schedulingCandidates": [
