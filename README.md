@@ -1,5 +1,10 @@
 # guard9s
 
+[![Release](https://img.shields.io/github/v/release/hcie123/guard9s)](https://github.com/hcie123/guard9s/releases/latest)
+[![CI](https://github.com/hcie123/guard9s/actions/workflows/ci.yml/badge.svg)](https://github.com/hcie123/guard9s/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/hcie123/guard9s)](LICENSE)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/hcie123/guard9s)](go.mod)
+
 [English](#english) | [中文](#中文)
 
 Project / 项目地址: https://github.com/hcie123/guard9s
@@ -8,8 +13,9 @@ Project / 项目地址: https://github.com/hcie123/guard9s
 
 > **Know what could break before you drain a Kubernetes node.**
 
-guard9s is a **read-only Kubernetes SRE tool** for the moment before node
-maintenance starts.
+guard9s is a **read-only Kubernetes SRE tool** for pre-maintenance node risk
+assessment. It checks PDBs, replicas, scheduling constraints, capacity, storage,
+Events and missing evidence before you cordon or drain a node.
 
 The maintenance command itself is usually the easy part. The harder part is
 deciding whether the node is actually ready to be touched. A PDB may block
@@ -296,7 +302,10 @@ guard9s is licensed under Apache License 2.0. See [LICENSE](LICENSE).
 
 > **在 drain 一个 Kubernetes 节点之前，先知道什么可能出问题。**
 
-guard9s 是一个**只读的 Kubernetes SRE 节点维护检查工具**。
+guard9s 是一个**只读的 Kubernetes SRE 节点维护风险检查工具**。
+
+它会在 cordon / drain 之前检查 PDB、副本、调度约束、容量、存储、Events
+以及缺失证据，帮助你判断节点当前是否适合维护。
 
 节点维护本身通常就是几条命令，真正难的是动手之前的判断：
 **这个节点现在到底能不能动？**
