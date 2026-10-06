@@ -62,15 +62,13 @@ right evidence **before** making the change.
 
 #### Prebuilt binary — no Go required
 
-**v0.4.0 is being prepared as the Initial Open Source Release.** Until the
-repository is made public and the release is published, there is no official v0.4.0 download
-URL. The repository is currently private. CI `SNAPSHOT` artifacts are test
-artifacts; they are not formal releases.
+**v0.4.0 is the initial open source release of guard9s.** Download the matching
+archive and `checksums.txt` from the
+[v0.4.0 GitHub Release](https://github.com/hcie123/guard9s/releases/tag/v0.4.0).
+CI `SNAPSHOT` artifacts remain test artifacts; use the formal Release assets for
+installation.
 
-After publication, download the matching archive and `checksums.txt` from the
-same GitHub Release.
-
-Linux amd64 example, using the planned release filenames:
+Linux amd64 example:
 
 ```sh
 grep '  guard9s_0.4.0_linux_amd64.tar.gz$' checksums.txt | sha256sum --check -
@@ -93,9 +91,8 @@ validation used a Linux amd64 CI archive on a machine without Go.
 
 #### Build from source
 
-To build from source, use **Go 1.26+**, as declared in [go.mod](go.mod).
-Repository access is required while the repository is private. Run the build
-from the cloned repository root:
+To build from source, use **Go 1.26+**, as declared in [go.mod](go.mod). Run the
+build from the cloned repository root:
 
 ```sh
 git clone https://github.com/hcie123/guard9s.git
@@ -290,7 +287,7 @@ clusters; `make live-test` stays opt-in with explicit test kubeconfig/context/no
 [Validation](docs/verification.md) · [Compatibility](docs/compatibility.md) ·
 [Analysis limits](docs/analysis.md) · [Live-test guide](docs/live-testing.md) ·
 [Performance](docs/performance.md) · [Security](SECURITY.md) ·
-[Release notes draft](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) ·
+[Release notes](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) ·
 [Code of conduct](CODE_OF_CONDUCT.md)
 
 guard9s is licensed under Apache License 2.0. See [LICENSE](LICENSE).
@@ -346,13 +343,12 @@ guard9s 会刻意停在“真正动集群”之前：它不会替你执行 `drai
 
 #### 预编译二进制：运行不需要 Go
 
-**v0.4.0 正在作为首次开源版本做最后发布准备。** 仓库目前仍为 Private；
-在仓库公开并正式发布版本之前，没有官方 v0.4.0 下载地址。
-CI 里的 `SNAPSHOT` 只是测试产物，不算正式 Release。
+**v0.4.0 是 guard9s 的首次正式开源版本。** 请从
+[v0.4.0 GitHub Release](https://github.com/hcie123/guard9s/releases/tag/v0.4.0)
+下载对应平台的归档和 `checksums.txt`。CI 里的 `SNAPSHOT` 仍然只是测试产物，
+正式安装请使用 Release 资产。
 
-正式发布后，请从同一个 GitHub Release 下载对应平台的归档和 `checksums.txt`。
-
-Linux amd64 示例，以下使用计划中的正式文件名：
+Linux amd64 示例：
 
 ```sh
 grep '  guard9s_0.4.0_linux_amd64.tar.gz$' checksums.txt | sha256sum --check -
@@ -376,7 +372,7 @@ Linux amd64 测试机上直接运行 CI 归档。
 #### 从源码构建
 
 如果从源码构建，按 [go.mod](go.mod) 使用 **Go 1.26+**。
-仓库仍为 Private 时需要访问权限；在克隆后的仓库根目录构建：
+在克隆后的仓库根目录构建：
 
 ```sh
 git clone https://github.com/hcie123/guard9s.git
@@ -551,7 +547,7 @@ TUI / JSON / Markdown
 
 [验证记录](docs/verification.md) · [兼容性](docs/compatibility.md) ·
 [分析边界](docs/analysis.md) · [人工验收指南](docs/live-testing.md) ·
-[性能](docs/performance.md) · [安全](SECURITY.md) · [发布说明草稿](CHANGELOG.md) ·
+[性能](docs/performance.md) · [安全](SECURITY.md) · [发布说明](CHANGELOG.md) ·
 [贡献指南](CONTRIBUTING.md) · [行为准则](CODE_OF_CONDUCT.md)
 
 guard9s 使用 Apache License 2.0 开源许可证。详见 [LICENSE](LICENSE)。
