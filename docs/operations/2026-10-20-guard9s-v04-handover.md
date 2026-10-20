@@ -3,7 +3,7 @@
 ## Scope and starting state
 
 - Repository: `hcie123/guard9s` (standalone checkout `/root/guard9s-test/guard9s`). The historical `/root/infra-lab/guard9s` directory was not used or changed.
-- Starting `main`: `d3d18ebc47e2e006f70b2a677564e0a5cdd9210b`; worktree clean; tag `v0.4.0` points to `e0c2f54208085a8ef72d11c59873923ee2404b74`.
+- Local checkout started at `main` `d3d18ebc47e2e006f70b2a677564e0a5cdd9210b`, worktree clean; tag `v0.4.0` points to `e0c2f54208085a8ef72d11c59873923ee2404b74`. Initial shell DNS prevented `git fetch`; subsequent GitHub API inspection established remote `main` is `a06dee8dc1bc6f6b9983f2286151a1dd6b04ca73`. The local starting commit is an ancestor of that remote main; PR #6 targets the actual remote `main` and GitHub reports it mergeable with only this handover file changed.
 - The repository has already published v0.4.0. This differs from the requested `0.4.0-dev`; no version, release tag, runtime behavior, Kubernetes resource, or CI configuration was changed in this audit.
 - Existing open-PR search returned no open pull requests. Historical v0.4.0 implementation and release work is already on `main`.
 
@@ -28,6 +28,6 @@ The 500/10,000 full-analysis benchmark was not added or run: this environment ha
 
 - Read-only inspection and source/document audit completed.
 - Local `go test`, `go test -race`, `go vet`, coverage and benchmarks: **not run**, because Go is absent. No test result is inferred from prior release records.
-- GitHub main check-runs for `d3d18ebc47e2e006f70b2a677564e0a5cdd9210b` were successful in the fetched Actions data; the latest observed repository workflow is the guard9s CI run on 2026-10-06. This is historical hosted evidence, not validation of a new change.
+- GitHub checks for the actual remote-main commit `a06dee8dc1bc6f6b9983f2286151a1dd6b04ca73` were successful. The latest observed prior completed workflow was guard9s CI on 2026-10-06; PR #6 run `39374050619` was queued at handover time. These are hosted checks, not local Go validation.
 - No code fix was justified by the source audit; the concrete unmeasured 500/10,000 scale is recorded as follow-up rather than claiming unverified optimization.
 - Next: use a Go 1.26.x host or hosted CI for the opt-in 500/10,000 benchmark and rerun full unit/race/vet/coverage gates before any v0.4 follow-up release decision. Keep all runtime behavior READ ONLY and do not access Kubernetes for this benchmark.
