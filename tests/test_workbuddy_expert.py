@@ -18,6 +18,15 @@ spec.loader.exec_module(package_tool)
 
 
 class ExpertPackageTests(unittest.TestCase):
+    def test_github_artifact_job_is_limited_to_pr_7_and_uses_runner_temp(self):
+        workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+        self.assertIn("workbuddy-expert-package:", workflow)
+        self.assertIn("github.event_name == 'pull_request' && github.event.pull_request.number == 7", workflow)
+        self.assertIn('"${RUNNER_TEMP}/k8s-ai-ops-diagnosis-expert.zip"', workflow)
+        self.assertIn("name: k8s-ai-ops-diagnosis-expert", workflow)
+        self.assertIn("retention-days: 7", workflow)
+        self.assertNotIn("dist/k8s-ai-ops-diagnosis-expert.zip", workflow)
+
     def test_documented_package_files_validate(self):
         self.assertEqual([], package_tool.validate())
 
