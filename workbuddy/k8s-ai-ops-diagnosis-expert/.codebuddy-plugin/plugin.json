@@ -1,0 +1,54 @@
+{
+  "name": "k8s-ai-ops-diagnosis-expert",
+  "version": "1.0.0",
+  "description": "Evidence-based offline Kubernetes scheduling, node and pod risk, and resource capacity diagnosis from pasted kubectl output, Events, and YAML.",
+  "author": {
+    "name": "hcie123",
+    "email": "1538115235@qq.com"
+  },
+  "agents": ["./agents/k8s-ai-ops-diagnosis-expert.md"],
+  "skills": ["./skills/k8s-offline-diagnostics"],
+  "expertType": "agent",
+  "agentName": "k8s-ai-ops-diagnosis-expert",
+  "displayName": {
+    "en": "K8s AI Operations Diagnosis Expert",
+    "zh": "K8s AI 运维诊断专家"
+  },
+  "profession": {
+    "en": "Kubernetes Operations Diagnosis Specialist",
+    "zh": "Kubernetes 运维诊断专家"
+  },
+  "displayDescription": {
+    "en": "Offline Kubernetes operations diagnosis based on pasted kubectl output, Events and YAML, with evidence, uncertainty and read-only recommendations.",
+    "zh": "专业 Kubernetes AI 运维助手，依据用户提供的日志、事件与配置离线诊断 Pod、节点、调度、资源、存储和网络故障并给出中文排查建议。"
+  },
+  "avatar": "avatars/expert.png",
+  "categoryId": "02-Engineering",
+  "defaultInitPrompt": {
+    "zh": "请基于我粘贴的 kubectl 输出、Event 或 YAML 做一次只读离线诊断。",
+    "en": "Please perform an offline, read-only diagnosis from the kubectl output, Events, or YAML I paste."
+  },
+  "plugin": "k8s-ai-ops-diagnosis-expert",
+  "tags": [
+    { "en": "Kubernetes Troubleshooting", "zh": "K8s 故障诊断" },
+    { "en": "Networking & Storage", "zh": "网络与存储" },
+    { "en": "Scheduling & Capacity", "zh": "调度与容量" }
+  ],
+  "quickPrompts": [
+    {
+      "zh": "请基于我粘贴的 kubectl 输出、Event 或 YAML 做一次只读离线诊断。",
+      "en": "Please perform an offline, read-only diagnosis from the kubectl output, Events, or YAML I paste."
+    },
+    {
+      "zh": "分析 Pending、CrashLoopBackOff 或 ImagePullBackOff，逐条引用 Event 并列出证据不足项。",
+      "en": "Diagnose Pending, CrashLoopBackOff, or ImagePullBackOff from Events and identify missing evidence."
+    },
+    {
+      "zh": "分析 Node NotReady、Cilium 网络或 PVC Pending，给出只读核查命令和风险提示。",
+      "en": "Analyze Node NotReady, Cilium networking, or PVC Pending with read-only checks and risk notes."
+    }
+  ],
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/hcie123/guard9s",
+  "keywords": ["Kubernetes", "offline diagnosis", "scheduling", "capacity", "read-only"]
+}
