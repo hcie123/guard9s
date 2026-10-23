@@ -16,6 +16,10 @@ description: Structured, evidence-first offline Kubernetes diagnosis from user-p
 5. 对任何不可见的约束或互相冲突的证据标 UNKNOWN；不因对象缺失而按“无约束”处理。
 6. 输出引用证据的中文报告、最小只读补充命令、人工评审的修复方向和风险/回滚考虑。
 
+## 常见故障模式
+
+诊断 Pending、CrashLoopBackOff、ImagePullBackOff、Node NotReady、OOMKilled、Cilium 网络、CPU/内存/磁盘压力、PVC Pending 与调度失败时，按 [故障模式证据表](references/fault-patterns.md) 区分观察事实、可能原因、缺失证据和安全建议。不得仅凭状态名断言根因。
+
 ## 证据标注
 
 - **观察：**输入直接出现的字段、状态或 Event 原文。
@@ -34,4 +38,4 @@ description: Structured, evidence-first offline Kubernetes diagnosis from user-p
 | 存储 | PVC/PV phase、locality、node affinity、可见 CSI attachment | 无法从清单证明后端健康、数据一致性或真实 detach/attach 成功 |
 | Event | type/reason/message/object/time/count | Event 可能过期/聚合，缺失不证明故障不存在 |
 
-详细算法和限制说明见 [guard9s 方法说明](references/guard9s-method.md) 与 [输入清单](references/input-checklist.md)。
+详细算法和限制说明见 [guard9s 方法说明](references/guard9s-method.md)、[输入清单](references/input-checklist.md) 和 [故障模式证据表](references/fault-patterns.md)。

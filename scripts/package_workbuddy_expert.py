@@ -20,6 +20,7 @@ REQUIRED_FILES = (
     "avatars/expert.png",
     "skills/k8s-offline-diagnostics/SKILL.md",
     "LICENSE",
+    "NOTICE",
     "README.md",
 )
 

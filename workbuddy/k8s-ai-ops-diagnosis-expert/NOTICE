@@ -1,0 +1,13 @@
+K8s AI 运维诊断专家
+Copyright 2026 hcie123 and contributors
+
+This package contains expert prompts, synthetic test scenarios, and a generated
+avatar. It does not redistribute or execute the guard9s program or its Go
+dependencies. The diagnostic methodology is summarized from the public guard9s
+project documentation:
+https://github.com/hcie123/guard9s
+
+The upstream repository's root NOTICE file inventories third-party licenses
+for dependencies used to build the guard9s binary. Those dependencies and the
+binary are not included in this WorkBuddy expert package. The expert package
+has no bundled runtime or third-party software dependencies.

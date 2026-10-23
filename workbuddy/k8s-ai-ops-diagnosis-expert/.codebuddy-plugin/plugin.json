@@ -20,7 +20,7 @@
   },
   "displayDescription": {
     "en": "Offline Kubernetes operations diagnosis based on pasted kubectl output, Events and YAML, with evidence, uncertainty and read-only recommendations.",
-    "zh": "离线诊断 Kubernetes 调度、节点与工作负载风险及资源容量，依据用户提供的 kubectl 输出、事件和 YAML 展示证据、未知项与只读建议。"
+    "zh": "专业 Kubernetes AI 运维助手，依据用户提供的日志、事件与配置离线诊断 Pod、节点、调度、资源、存储和网络故障并给出中文排查建议。"
   },
   "avatar": "avatars/expert.png",
   "categoryId": "02-Engineering",
@@ -30,9 +30,9 @@
   },
   "plugin": "k8s-ai-ops-diagnosis-expert",
   "tags": [
-    { "en": "Kubernetes", "zh": "Kubernetes" },
-    { "en": "Scheduling", "zh": "调度诊断" },
-    { "en": "Capacity", "zh": "容量分析" }
+    { "en": "Kubernetes Troubleshooting", "zh": "K8s 故障诊断" },
+    { "en": "Networking & Storage", "zh": "网络与存储" },
+    { "en": "Scheduling & Capacity", "zh": "调度与容量" }
   ],
   "quickPrompts": [
     {
@@ -40,12 +40,12 @@
       "en": "Please perform an offline, read-only diagnosis from the kubectl output, Events, or YAML I paste."
     },
     {
-      "zh": "分析这些 FailedScheduling 事件和 Pod YAML，列出证据、未知项和安全的下一步核查。",
-      "en": "Analyze these FailedScheduling Events and Pod YAML; list evidence, unknowns, and safe next checks."
+      "zh": "分析 Pending、CrashLoopBackOff 或 ImagePullBackOff，逐条引用 Event 并列出证据不足项。",
+      "en": "Diagnose Pending, CrashLoopBackOff, or ImagePullBackOff from Events and identify missing evidence."
     },
     {
-      "zh": "根据节点与 Pod 快照评估维护风险和请求资源容量，不要执行命令。",
-      "en": "Assess maintenance risk and request-based capacity from these Node and Pod snapshots. Do not execute commands."
+      "zh": "分析 Node NotReady、Cilium 网络或 PVC Pending，给出只读核查命令和风险提示。",
+      "en": "Analyze Node NotReady, Cilium networking, or PVC Pending with read-only checks and risk notes."
     }
   ],
   "license": "Apache-2.0",

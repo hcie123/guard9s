@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import importlib.util
+import json
+import re
 import tempfile
 import unittest
 import zipfile
@@ -24,8 +26,9 @@ class ExpertPackageTests(unittest.TestCase):
         text = agent_path.read_text(encoding="utf-8")
         for phrase in (
             "不连接 Kubernetes API", "不运行 `kubectl`", "UNKNOWN（证据不足）",
-            "FailedScheduling", "PDB", "requests", "CRITICAL", "修复方向",
+            "FailedScheduling", "PDB", "requests", "CRITICAL", "修复建议",
             "不构成 guard9s 程序输出", "kubectl get", "kubectl describe",
+            "故障结论", "可能原因", "## 证据", "只读排查命令", "风险提示",
         ):
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, text)
@@ -33,6 +36,55 @@ class ExpertPackageTests(unittest.TestCase):
         for mutation in ("`apply`", "`patch`", "`delete`", "`drain`", "`exec`", "`port-forward`"):
             # Dangerous verbs are explicitly forbidden in context.
             self.assertIn(mutation, text)
+
+    def test_synthetic_fault_corpus_has_required_scenarios_and_safe_expectations(self):
+        corpus_path = ROOT / "tests/scenarios/k8s-offline-diagnosis.json"
+        corpus = json.loads(corpus_path.read_text(encoding="utf-8"))
+        scenarios = corpus["scenarios"]
+        ids = {item["id"] for item in scenarios}
+        expected = {
+            "normal-snapshot", "pod-pending-cpu", "pod-pending-affinity", "crashloop-probe",
+            "imagepull-backoff", "node-notready", "oomkilled-evidence", "cilium-networkpolicy",
+            "cpu-pressure", "memory-pressure", "disk-pressure", "pvc-pending-waitforconsumer",
+            "scheduling-taint", "insufficient-evidence", "sensitive-redaction",
+        }
+        self.assertGreaterEqual(len(scenarios), 10)
+        self.assertTrue(expected <= ids)
+        allowed = re.compile(r"^(?:kubectl (?:get|describe|top|logs)(?:\s|$)|cilium status(?:\s|$)|df(?:\s|$))")
+        for item in scenarios:
+            with self.subTest(scenario=item["id"]):
+                for field in ("category", "input", "expected_conclusion", "required_evidence", "expected_unknowns", "safe_commands"):
+                    self.assertIn(field, item)
+                self.assertTrue(item["required_evidence"])
+                self.assertTrue(item["expected_unknowns"])
+                for command in item["safe_commands"]:
+                    self.assertRegex(command, allowed)
+                    self.assertNotRegex(command, r"(?i)\b(apply|patch|delete|edit|exec|drain|cordon|restart|rollout)\b")
+        redaction = next(item for item in scenarios if item["id"] == "sensitive-redaction")
+        self.assertTrue(redaction["sensitive_markers"])
+        for marker in redaction["sensitive_markers"]:
+            self.assertNotIn(marker, redaction["expected_response"])
+        self.assertIn("[REDACTED]", redaction["expected_response"])
+
+    def test_fault_reference_covers_all_named_diagnoses_and_report_contract(self):
+        ref = package_tool.PACKAGE / "skills/k8s-offline-diagnostics/references/fault-patterns.md"
+        text = ref.read_text(encoding="utf-8")
+        for term in ("Pending", "CrashLoopBackOff", "ImagePullBackOff", "Node NotReady", "OOMKilled", "Cilium", "CPU", "MemoryPressure", "DiskPressure", "PVC Pending", "FailedScheduling", "UNKNOWN", "只读核查", "建议/风险"):
+            with self.subTest(term=term):
+                self.assertIn(term, text)
+
+    def test_license_copyright_and_runtime_dependency_scope(self):
+        package = package_tool.PACKAGE
+        manifest = json.loads((package / ".codebuddy-plugin/plugin.json").read_text(encoding="utf-8"))
+        license_text = (package / "LICENSE").read_text(encoding="utf-8")
+        notice = (package / "NOTICE").read_text(encoding="utf-8")
+        self.assertEqual("Apache-2.0", manifest["license"])
+        self.assertIn("Apache License", license_text)
+        self.assertIn("Copyright 2026 hcie123 and contributors", notice)
+        self.assertIn("no bundled runtime or third-party software dependencies", notice)
+        self.assertFalse((package / ".mcp.json").exists())
+        self.assertFalse(any(package.rglob("*.go")))
+        self.assertFalse(any(package.rglob("*.exe")))
 
     def test_build_zip_layout_size_paths_and_contents(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -48,7 +100,9 @@ class ExpertPackageTests(unittest.TestCase):
                 self.assertIn(prefix + "agents/" + package_tool.NAME + ".md", names)
                 self.assertIn(prefix + "avatars/expert.png", names)
                 self.assertIn(prefix + "skills/k8s-offline-diagnostics/SKILL.md", names)
+                self.assertIn(prefix + "skills/k8s-offline-diagnostics/references/fault-patterns.md", names)
                 self.assertIn(prefix + "LICENSE", names)
+                self.assertIn(prefix + "NOTICE", names)
                 self.assertFalse(any(Path(name).is_absolute() or ".." in Path(name).parts for name in names))
                 manifest = __import__("json").loads(archive.read(prefix + ".codebuddy-plugin/plugin.json"))
                 self.assertEqual(package_tool.NAME, manifest["agentName"])

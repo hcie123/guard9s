@@ -21,7 +21,9 @@ k8s-ai-ops-diagnosis-expert/
 ├── avatars/expert.png
 ├── skills/k8s-offline-diagnostics/SKILL.md
 ├── skills/k8s-offline-diagnostics/references/
-└── README.md
+├── README.md
+├── LICENSE
+└── NOTICE
 ```
 
 结构和字段按 [WorkBuddy 官方专家开发文档](https://open.workbuddy.cn/docs/expert)；企业上传和权限配置按 [腾讯云 WorkBuddy 企业专家管理](https://cloud.tencent.com/document/product/1831/134421)。
@@ -37,7 +39,9 @@ python3 -m unittest discover -s tests -p 'test_workbuddy_expert.py' -v
 
 构建产物：`dist/k8s-ai-ops-diagnosis-expert.zip`。打包脚本校验官方要求的核心字段、Agent 文件名/frontmatter、相对路径、3 个 tags/quickPrompts、默认提示与首个 quickPrompt 一致、40–50 个中文描述汉字、ZIP 内目录层级和小于 20 MB 的限制。头像为 512×512 PNG 且低于 500 KB。
 
-这些是本地结构和格式检查；WorkBuddy 客户端导入、Agent 对话质量和开放平台审核尚未验证。ZIP 不能据此描述成已发布或已通过平台解析。
+`tests/scenarios/k8s-offline-diagnosis.json` 提供 15 个合成提示验收案例，覆盖正常、用户指定故障、证据不足和敏感值脱敏；自动测试检查场景清单/安全命令边界和专家提示中的诊断覆盖。这些测试不调用 WorkBuddy 模型，不代表 LLM 实际对话输出已经通过。
+
+这些是本地结构、格式和静态提示契约检查；WorkBuddy 客户端导入、Agent 对话质量和开放平台审核尚未验证。ZIP 不能据此描述成已发布或已通过平台解析。
 
 ## 上传与发布
 
@@ -55,4 +59,4 @@ python3 -m unittest discover -s tests -p 'test_workbuddy_expert.py' -v
 
 - 上游项目：<https://github.com/hcie123/guard9s>
 - 许可证：Apache-2.0；本 Expert 的新增提示词与参考说明按 Apache-2.0 一并提供。
-- `NOTICE`/来源与局限详见仓库根目录与 `skills/k8s-offline-diagnostics/references/guard9s-method.md`。
+- 来源、版权和第三方依赖边界见包内 `NOTICE`；该 ZIP 不包含 guard9s 二进制或 Go 第三方依赖。

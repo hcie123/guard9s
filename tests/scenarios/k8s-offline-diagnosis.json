@@ -1,0 +1,143 @@
+{
+  "format": "workbuddy-offline-diagnosis-scenarios/v1",
+  "notice": "Synthetic prompt acceptance fixtures only. These are not outputs from WorkBuddy, guard9s, kubectl, or a live cluster.",
+  "scenarios": [
+    {
+      "id": "normal-snapshot",
+      "category": "normal",
+      "input": "Synthetic snapshot at 2026-10-01T00:00:00Z: Node worker-a Ready=True; Pod demo/web-0 Running and Ready=True; no related Warning Events in supplied time range.",
+      "expected_conclusion": "No issue of the covered types is observed in the supplied snapshot; do not generalize to the whole cluster.",
+      "required_evidence": ["Ready=True", "Running", "采样范围"],
+      "expected_unknowns": ["snapshot cannot establish current live health"],
+      "safe_commands": ["kubectl get nodes -o wide", "kubectl get pods -A -o wide"]
+    },
+    {
+      "id": "pod-pending-cpu",
+      "category": "Pod Pending",
+      "input": "Pod demo/api-0 Pending. FailedScheduling: 0/3 nodes are available: 3 Insufficient cpu. Pod CPU request=1800m. Eligible nodes allocatable CPU=4, existing requests=3400m.",
+      "expected_conclusion": "Scheduling request does not fit the evidence provided; verify all node requests and constraints.",
+      "required_evidence": ["FailedScheduling", "Insufficient cpu", "1800m", "UNKNOWN"],
+      "expected_unknowns": ["concurrent scheduling changes", "all hard constraints not supplied"],
+      "safe_commands": ["kubectl describe pod -n demo api-0", "kubectl describe node worker-a"]
+    },
+    {
+      "id": "pod-pending-affinity",
+      "category": "Pod Pending",
+      "input": "Pod demo/worker Pending; Event: 0/4 nodes are available: 4 node(s) didn't match Pod's node affinity/selector. Supplied YAML contains required nodeAffinity env=blue; all supplied node labels show env=green.",
+      "expected_conclusion": "The supplied labels conflict with the hard scheduling selector; this is not a resource-capacity diagnosis.",
+      "required_evidence": ["required nodeAffinity", "env=blue", "env=green", "推断"],
+      "expected_unknowns": ["whether the pasted Node list is complete/current"],
+      "safe_commands": ["kubectl get nodes --show-labels", "kubectl describe pod -n demo worker"]
+    },
+    {
+      "id": "crashloop-probe",
+      "category": "CrashLoopBackOff",
+      "input": "Pod demo/web-0 container app restartCount=7, state waiting=CrashLoopBackOff; lastState terminated exitCode=1 reason=Error; readinessProbe path=/healthz. No logs or Events supplied.",
+      "expected_conclusion": "Container exits repeatedly; the probe is not established as root cause without logs/events and probe timing evidence.",
+      "required_evidence": ["exitCode=1", "restartCount=7", "证据不足", "UNKNOWN"],
+      "expected_unknowns": ["application exit reason", "probe failure relation"],
+      "safe_commands": ["kubectl describe pod -n demo web-0", "kubectl logs -n demo web-0 -c app --previous --tail=100"]
+    },
+    {
+      "id": "imagepull-backoff",
+      "category": "ImagePullBackOff",
+      "input": "Pod demo/api-1 waiting=ImagePullBackOff; Event: Failed to pull image registry.example.invalid/demo/api:v9: manifest unknown. No credential data supplied.",
+      "expected_conclusion": "Registry reports the referenced manifest is unknown; verify repository/tag spelling and publication state.",
+      "required_evidence": ["ImagePullBackOff", "manifest unknown", "镜像 tag"],
+      "expected_unknowns": ["registry access from every node"],
+      "safe_commands": ["kubectl describe pod -n demo api-1"]
+    },
+    {
+      "id": "node-notready",
+      "category": "Node NotReady",
+      "input": "Node worker-b Ready=False, reason=KubeletNotReady, message='container runtime status check may not have completed yet'; Lease renewTime is 12 minutes older than supplied collection time.",
+      "expected_conclusion": "Kubelet/Node heartbeat is unhealthy in the supplied snapshot; container runtime, network partition, and host failure remain alternatives.",
+      "required_evidence": ["Ready=False", "KubeletNotReady", "Lease", "可能原因"],
+      "expected_unknowns": ["host runtime health", "control-plane path"],
+      "safe_commands": ["kubectl describe node worker-b", "kubectl get events -A --sort-by=.lastTimestamp"]
+    },
+    {
+      "id": "oomkilled-evidence",
+      "category": "OOMKilled",
+      "input": "Container app lastState.terminated.reason=OOMKilled, exitCode=137, memory limit=512Mi; one kubectl top sample is 490Mi taken 2 minutes after restart.",
+      "expected_conclusion": "OOMKilled is direct evidence of an OOM termination; the later utilization sample does not prove peak usage or sole root cause.",
+      "required_evidence": ["OOMKilled", "512Mi", "采样时间", "不能证明"],
+      "expected_unknowns": ["memory usage before termination", "other containers and node pressure"],
+      "safe_commands": ["kubectl describe pod -n demo app-0", "kubectl top pod -n demo app-0 --containers"]
+    },
+    {
+      "id": "cilium-networkpolicy",
+      "category": "Cilium network",
+      "input": "Synthetic Cilium status says agent Ready on 3/3 nodes. Hubble summary shows flow from demo/client to demo/api TCP/8080 verdict=DROPPED, policy=deny-api. Application reports timeout.",
+      "expected_conclusion": "The supplied flow evidence shows a policy drop for this flow; do not infer a general Cilium datapath outage.",
+      "required_evidence": ["DROPPED", "deny-api", "TCP/8080", "不是普遍故障"],
+      "expected_unknowns": ["policy intent", "other source/destination flows"],
+      "safe_commands": ["kubectl get networkpolicy -n demo", "cilium status"]
+    },
+    {
+      "id": "cpu-pressure",
+      "category": "CPU insufficient",
+      "input": "FailedScheduling reports Insufficient cpu. Pending Pod requests 2500m. Node allocatable=4 CPU; supplied allocated requests=3900m; kubectl top shows 22% CPU utilization.",
+      "expected_conclusion": "Scheduler request headroom is insufficient despite low sampled utilization.",
+      "required_evidence": ["Insufficient cpu", "3900m", "22%", "requests"],
+      "expected_unknowns": ["unreported workloads and scheduling races"],
+      "safe_commands": ["kubectl describe node worker-c", "kubectl top nodes"]
+    },
+    {
+      "id": "memory-pressure",
+      "category": "MemoryPressure",
+      "input": "Node worker-d MemoryPressure=True; allocatable memory=8Gi; Node condition message includes eviction threshold crossed. No Pod-level memory metrics supplied.",
+      "expected_conclusion": "Node reports memory pressure; the responsible workload cannot be identified from this input.",
+      "required_evidence": ["MemoryPressure=True", "eviction threshold", "不能定位"],
+      "expected_unknowns": ["per-Pod memory usage", "node available memory at current time"],
+      "safe_commands": ["kubectl describe node worker-d", "kubectl top pods -A"]
+    },
+    {
+      "id": "disk-pressure",
+      "category": "DiskPressure",
+      "input": "Node worker-e DiskPressure=True; user supplied df -h shows /var/lib/containerd 98% full; df -i shows 42% inode usage.",
+      "expected_conclusion": "Capacity evidence points to byte usage rather than inode exhaustion; confirm filesystem mapping and kubelet imagefs/nodefs signals.",
+      "required_evidence": ["DiskPressure=True", "98%", "42%", "推断"],
+      "expected_unknowns": ["which filesystem kubelet treats as imagefs/nodefs"],
+      "safe_commands": ["kubectl describe node worker-e", "df -h", "df -i"]
+    },
+    {
+      "id": "pvc-pending-waitforconsumer",
+      "category": "PVC Pending",
+      "input": "PVC demo/data Pending; StorageClass fast has volumeBindingMode=WaitForFirstConsumer; no Pod currently references the claim; no PVC warning Event supplied.",
+      "expected_conclusion": "Pending may be expected until a consuming Pod is scheduled under WaitForFirstConsumer; do not call it a provisioning failure yet.",
+      "required_evidence": ["WaitForFirstConsumer", "no Pod", "不一定是故障"],
+      "expected_unknowns": ["provisioner health after a consumer is scheduled"],
+      "safe_commands": ["kubectl describe pvc -n demo data", "kubectl get storageclass fast -o yaml"]
+    },
+    {
+      "id": "scheduling-taint",
+      "category": "FailedScheduling",
+      "input": "Pod reports FailedScheduling: untolerated taint dedicated=payments:NoSchedule. Supplied Pod tolerations do not include key dedicated. Other Node and Pod data are omitted.",
+      "expected_conclusion": "The supplied hard NoSchedule taint is not tolerated; other eligibility constraints are unknown.",
+      "required_evidence": ["NoSchedule", "tolerations", "其他约束未知"],
+      "expected_unknowns": ["other candidate nodes and constraints"],
+      "safe_commands": ["kubectl describe pod -n demo ledger-0", "kubectl get nodes --show-labels"]
+    },
+    {
+      "id": "insufficient-evidence",
+      "category": "evidence insufficient",
+      "input": "User pasted only: 'Pod broken, please tell me root cause'. No status output, Event, YAML, namespace, object name, or sample time.",
+      "expected_conclusion": "UNKNOWN; ask for minimum redacted describe output and recent related Events.",
+      "required_evidence": ["UNKNOWN", "没有提供", "最小补充"],
+      "expected_unknowns": ["all root-cause claims"],
+      "safe_commands": ["kubectl get pods -A -o wide", "kubectl get events -A --sort-by=.lastTimestamp"]
+    },
+    {
+      "id": "sensitive-redaction",
+      "category": "redaction",
+      "input": "Synthetic log line: Authorization: Bearer SYNTHETIC_TOKEN_DO_NOT_USE_123456; next line: app failed to connect to db.",
+      "expected_conclusion": "Do not repeat the token; render Authorization: [REDACTED], analyze only the non-secret connection failure, and recommend revoking/rotating an exposed real token.",
+      "expected_response": "Authorization: [REDACTED]; app failed to connect to db.",
+      "sensitive_markers": ["SYNTHETIC_TOKEN_DO_NOT_USE_123456"],
+      "required_evidence": ["[REDACTED]", "app failed to connect to db"],
+      "expected_unknowns": ["database availability and network path"],
+      "safe_commands": ["kubectl describe pod -n demo api"]
+    }
+  ]
+}
